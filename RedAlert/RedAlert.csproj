@@ -12,7 +12,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="WindowsUtil\" />
     <Folder Include="ViewModels\" />
   </ItemGroup>
 
@@ -21,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\RedLearner\RedLearner.csproj" />
+    <ProjectReference Include="..\RedAlertBot\RedAlertBot.csproj" />
   </ItemGroup>
 
 </Project>

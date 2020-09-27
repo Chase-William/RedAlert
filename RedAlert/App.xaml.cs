@@ -2,10 +2,8 @@
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
-using RedAlertUI.WindowsUtil;
-using RedLearner;
 
-namespace RedAlertUI
+namespace RedAlert
 {
     /// <summary>
     /// Interaction logic for App.xaml

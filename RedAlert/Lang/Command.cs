@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
-namespace RedAlertUI.Lang
+namespace RedAlert.Lang
 {
     public class Command : ICommand
     {

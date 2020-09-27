@@ -8,17 +8,18 @@ using System.Timers;
 using System.Windows;
 using System.Windows.Input;
 using RedAlert.Lang;
-using RedAlertUI.Lang;
-using RedAlertUI.WindowsUtil;
-using HWND = System.IntPtr;
-using Point = System.Drawing.Point;
-using Size = System.Drawing.Size;
+using RedAlertBot;
+using RedAlertBot.Util;
 
-namespace RedAlertUI.ViewModels
+namespace RedAlert.ViewModels
 {
     public class MainWindowVM : Notifier
     {
-        public ImageRecorder Recorder { get; set; }
+        public readonly string[] MODES = { "Tribe Logging" };
+
+        #region Properties
+        public RedAlertBot.RedAlertBot Bot { get; set; } = RedAlertBot.RedAlertBot.Bot;
+        
 
         private string activeWindowTxt;
         /// <summary>
@@ -37,11 +38,17 @@ namespace RedAlertUI.ViewModels
         }
 
         public ICommand SetRecordingWindowCommand { get; set; }     
+        public ICommand ToggleBotCommand { get; set; }
+        #endregion
 
         public MainWindowVM()
-        {
-            Recorder = new ImageRecorder();            
-            SetRecordingWindowCommand = new Command(Recorder.ScanForArkWindow);
+        {            
+            ActiveWindowTxt = "NULL";            
+            SetRecordingWindowCommand = new Command(Bot.Recorder.ScanForArkWindow);
+            Bot.Recorder.TargetWindowDiscoveredChanged += (sender, args) =>
+            {
+                ActiveWindowTxt = args.WindowHWND.ToString();
+            };
         }                
     }    
 }

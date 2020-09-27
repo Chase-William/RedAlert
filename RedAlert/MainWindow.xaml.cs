@@ -2,9 +2,7 @@
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows;
-using RedAlertUI.ViewModels;
-using RedAlertUI.WindowsUtil;
-
+using RedAlert.ViewModels;
 namespace RedAlert
 {
     /// <summary>
@@ -16,11 +14,6 @@ namespace RedAlert
 
         public MainWindow()
         {
-
-#if DEBUG
-            User32.InitConsole();
-#endif
-
             InitializeComponent();
 
             //VM.Recorder.RecordingStarted += delegate
@@ -34,7 +27,7 @@ namespace RedAlert
             //};
 
             // Try to get the ark window apon launch
-            VM.Recorder.ScanForArkWindow();            
+            VM.Bot.Recorder.ScanForArkWindow();            
         }
     }
 }
