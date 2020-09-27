@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30413.136
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RedAlert", "RedAlert\RedAlert.csproj", "{696DC044-A884-46A9-97D3-1A8C7813C0CE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RedLearner", "RedLearner\RedLearner.csproj", "{C0CC9609-8E5C-4CDF-9860-7EE8EA506CA9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{696DC044-A884-46A9-97D3-1A8C7813C0CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{696DC044-A884-46A9-97D3-1A8C7813C0CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{696DC044-A884-46A9-97D3-1A8C7813C0CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{696DC044-A884-46A9-97D3-1A8C7813C0CE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C0CC9609-8E5C-4CDF-9860-7EE8EA506CA9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C0CC9609-8E5C-4CDF-9860-7EE8EA506CA9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C0CC9609-8E5C-4CDF-9860-7EE8EA506CA9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C0CC9609-8E5C-4CDF-9860-7EE8EA506CA9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D7DD46E3-80FC-4F22-9843-563BD39B1C58}
+	EndGlobalSection
+EndGlobal

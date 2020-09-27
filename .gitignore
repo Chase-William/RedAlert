@@ -1,0 +1,7 @@
+#Directories to ignore
+
+.vs/
+RedAlert/bin
+RedAlert/obj
+RedLearner/bin
+RedLearner/obj
