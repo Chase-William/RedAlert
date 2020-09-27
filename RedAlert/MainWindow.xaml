@@ -21,6 +21,10 @@
             <RowDefinition Height="30"/>
             <RowDefinition Height="30"/>
             <RowDefinition Height="30"/>
+            <!-- Recording Controls -->
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="200"/>
         </Grid.RowDefinitions>
 
         <Button Content="Scan For Ark Window"
@@ -31,10 +35,15 @@
         <Label Content="{Binding Recorder.IsRecording}" 
                Grid.Row="1" 
                VerticalAlignment="Center"/>
-        <ToggleButton Content="Disabled" 
+        <ToggleButton Content="{Binding Bot.IsBotEnabled, Converter={StaticResource BoolToStringConverter}}" 
                       Grid.Row="2" 
                       Grid.Column="1"
                       Command="{Binding ToggleBotCommand}"/>
         <ComboBox Grid.Row="2" ItemsSource="{Binding MODES}"/>
+
+        <Slider Minimum="{Binding Bot.Recorder.RecordingAreaOrigin.X}" Value="{Binding Bot.Recorder.RecordingAreaOffset.Width}" Maximum="{Binding Bot.Recorder.RecordingAreaOrigin.Width}" Grid.Row="3"/>
+        <Slider Minimum="{Binding Bot.Recorder.RecordingAreaOrigin.Y}" Value="{Binding Bot.Recorder.RecordingAreaOffset.Height}" Maximum="{Binding Bot.Recorder.RecordingAreaOrigin.Height}" Grid.Row="4"/>
+
+        <Image Grid.Row="5" Grid.ColumnSpan="2" Source="ss.jepg"/>
     </Grid>
 </Window>

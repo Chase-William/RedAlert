@@ -37,8 +37,12 @@ namespace RedAlert.ViewModels
             }
         }
 
-        public ICommand SetRecordingWindowCommand { get; set; }     
-        public ICommand ToggleBotCommand { get; set; }
+        public ICommand SetRecordingWindowCommand { get; set; }
+        public ICommand ToggleBotCommand => new Command(() =>
+        {
+            // Toggling the bot
+            Bot.IsBotEnabled = !Bot.IsBotEnabled;
+        });
         #endregion
 
         public MainWindowVM()

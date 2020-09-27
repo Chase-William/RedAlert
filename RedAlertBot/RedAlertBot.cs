@@ -12,6 +12,10 @@ namespace RedAlertBot
         public static RedAlertBot Bot => bot;
         #endregion
 
+        #region Events
+        public event EventHandler<BotIsEnabledChangedArgs> BotIsEnabledChanged; // Bot has been enabled or disabled
+        #endregion
+
         #region Properties
         private bool isBotEnabled;
         /// <summary>
@@ -24,15 +28,17 @@ namespace RedAlertBot
             {
                 if (IsBotEnabled == value) return;
                 isBotEnabled = value;
+                BotIsEnabledChanged?.Invoke(this, new BotIsEnabledChangedArgs(IsBotEnabled));
                 NotifyPropertyChanged();
             }
         }
 
-        public ImageRecorder Recorder { get; set; } = new ImageRecorder();
+        public ImageRecorder Recorder { get; set; }
         #endregion
 
         private RedAlertBot()
         {
+            Recorder = new ImageRecorder(this);
 #if DEBUG
             WindowsUtil.InitConsole();
 #endif
@@ -44,5 +50,12 @@ namespace RedAlertBot
             WindowsUtil.CloseConsole();
 #endif
         }
+    }
+
+    public class BotIsEnabledChangedArgs : EventArgs
+    {
+        public bool IsEnabled { get; set; }
+
+        public BotIsEnabledChangedArgs(bool _isEnabled) => IsEnabled = _isEnabled;       
     }
 }

@@ -1,4 +1,5 @@
-﻿using RedAlertBot.Util;
+﻿using RedAlertBot.Lang;
+using RedAlertBot.Util;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -8,27 +9,29 @@ using HWND = System.IntPtr;
 
 namespace RedAlertBot
 {
+    /// <summary>
+    /// Manages the recording of the target window's screen.
+    /// </summary>
     public class ImageRecorder : Notifier
     {
         #region Constants
         private const string ARK_WINDOW_TITLE = "ARK: Survival Evolved";
-        private const string ARK_WINDOW_NOT_FOUND = "Ark Window Not Found";
         public const int DEFAULT_TIMER_INTERVAL = 2000;
-        #endregion
-
-        /// <summary>
-        /// Learner that classifies images.
-        /// </summary>
-        public static RedLearner.RedLearner Learner { get; private set; } = new RedLearner.RedLearner();
+        #endregion        
 
         #region Events
-        public event EventHandler<ImageRecordingEventArgs> RecordingStarted;                        // Recording of target window has started
-        public event EventHandler<ImageRecordingEventArgs> RecordingStopped;                        // Recording of target window has stopped
+        public event EventHandler<ImageRecordingEventArgs> RecordingStateChanged;                        // Recording of target window has changed
         public event EventHandler<TargetWindowDiscoveredChangedArgs> TargetWindowDiscoveredChanged; // Target window value has changed
+        #endregion
+
+        #region Fields
+        private RedAlertBot bot;
         #endregion
 
         #region Properties
         public Timer RecordingTimer = new Timer(DEFAULT_TIMER_INTERVAL);
+
+        public ImagePredictor Predictor { get; set; } = new ImagePredictor();
 
         private HWND targetWindowHWND;
         /// <summary>
@@ -43,16 +46,12 @@ namespace RedAlertBot
                 targetWindowHWND = value;
                 TargetWindowDiscoveredChanged?.Invoke(this, new TargetWindowDiscoveredChangedArgs(TargetWindowHWND));
 
-                if (targetWindowHWND == HWND.Zero)
-                {
-                    IsRecording = false;
-                    RecordingStopped?.Invoke(this, new ImageRecordingEventArgs(isRecording));
-                }
-                else
-                {
-                    IsRecording = true;
-                    RecordingStarted?.Invoke(this, new ImageRecordingEventArgs(isRecording));
-                }
+                // If the bot is disabled the recording cannot start
+                if (bot.IsBotEnabled)
+                    if (targetWindowHWND == HWND.Zero)
+                        IsRecording = false;                    
+                    else
+                        IsRecording = true;                    
             }
         }
 
@@ -60,20 +59,46 @@ namespace RedAlertBot
         public bool IsRecording
         {
             get => isRecording;
-            set
+            private set
             {
                 if (IsRecording == value) return;
                 isRecording = value;
+                RecordingStateChanged?.Invoke(this, new ImageRecordingEventArgs(isRecording));
                 NotifyPropertyChanged();
             }
         }
+
+        public NotifyingRect RecordingAreaOffset { get; set; }
+        public NotifyingRect RecordingAreaOrigin { get; private set; }
         #endregion
 
-        public ImageRecorder()
+        public ImageRecorder(RedAlertBot _bot)
         {
+            bot = _bot;
+            // If the bot has been disabled, notify the IsRecording state variable
+            bot.BotIsEnabledChanged += (sender, args) =>
+            {
+                // If the bot is disabled, turn off the recording
+                if (args.IsEnabled)
+                    IsRecording = true;
+                else
+                    IsRecording = false;
+            };
             RecordingTimer.Elapsed += RecordingTimer_Elapsed;
-            RecordingStarted += delegate { RecordingTimer.Start(); };
-            RecordingStopped += delegate { RecordingTimer.Stop(); };
+            // Toggle the recording when the recording state changes
+            RecordingStateChanged += (sender, args) =>
+            {
+                if (args.IsRecording)
+                    RecordingTimer.Start();
+                else                
+                    RecordingTimer.Stop();                
+            };
+            // Update the recording area origin rect when the target window is discovered or lost
+            TargetWindowDiscoveredChanged += delegate
+            {
+                _ = WindowsUtil.GetWindowRect(TargetWindowHWND, out RECT sRect);
+                RecordingAreaOrigin = new NotifyingRect(sRect);
+            };
         }
 
         private void RecordingTimer_Elapsed(object sender, ElapsedEventArgs e)
@@ -81,9 +106,9 @@ namespace RedAlertBot
             SaveBitmap(CaptureWindowBitmap());
 
 #if DEBUG
-            Console.WriteLine(Learner.ClassifySingleImage("../../ss.jpeg"));
+            Predictor.PredictImage("../../ss.jpeg");            
 #else
-            Learner.ClassifySingleImage("../../ss.jpeg");
+            throw new NotImplementedException();
 #endif
 
         }
@@ -91,6 +116,7 @@ namespace RedAlertBot
         private Bitmap CaptureWindowBitmap()
         {
             _ = WindowsUtil.GetWindowRect(TargetWindowHWND, out RECT sRect);
+            RecordingAreaOrigin = new NotifyingRect(sRect);
 
             Bitmap bmp = new Bitmap(sRect.right - sRect.left, sRect.bottom - sRect.top, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
             Graphics gfxBmp = Graphics.FromImage(bmp);
@@ -106,6 +132,7 @@ namespace RedAlertBot
         {
             bitmap.Save("ss.jpeg");
         }
+        
 
         /// <summary>
         /// Tries to retrieve the HWND for the Ark Survival Evolved window.

@@ -1,7 +1,8 @@
 ﻿<Application x:Class="RedAlert.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:RedAlert"
+             xmlns:local="clr-namespace:RedAlert" 
+             xmlns:converters="clr-namespace:RedAlert.Converters"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <Style x:Key="MainWindow" TargetType="Window">
@@ -27,5 +28,7 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <converters:BoolToStringConverter x:Key="BoolToStringConverter"/>
     </Application.Resources>
 </Application>
