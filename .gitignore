@@ -3,5 +3,7 @@
 .vs/
 RedAlert/bin
 RedAlert/obj
+RedAlertBot/bin
+RedAlertBot/obj
 RedLearner/bin
 RedLearner/obj
