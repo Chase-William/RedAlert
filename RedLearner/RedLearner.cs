@@ -71,10 +71,17 @@ namespace RedLearner
                 ImagePath = path
             };
 
-            // Make prediction function (input = ImageData, output = ImagePrediction)
-            var predictor = mlContext.Model.CreatePredictionEngine<ImageData, ImagePrediction>(model);
-            var prediction = predictor.Predict(imageData);
-           return $"Image: {Path.GetFileName(imageData.ImagePath)} predicted as: {prediction.PredictedLabelValue} with score: {prediction.Score.Max()} ";
+            try
+            {
+                // Make prediction function (input = ImageData, output = ImagePrediction)
+                var predictor = mlContext.Model.CreatePredictionEngine<ImageData, ImagePrediction>(model);
+                var prediction = predictor.Predict(imageData);
+                return $"Image: {Path.GetFileName(imageData.ImagePath)} predicted as: {prediction.PredictedLabelValue} with score: {prediction.Score.Max()} ";
+            }            
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
 
         private ITransformer GenerateModel(MLContext mlContext)

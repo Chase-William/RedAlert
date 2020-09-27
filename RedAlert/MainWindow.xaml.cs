@@ -2,12 +2,8 @@
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows;
-using HWND = System.IntPtr; // HWND == handle to a window C++ win32.dll
-using HWINEVENTHOOK = System.IntPtr;
-using HMODULE = System.IntPtr;
-using WINEVENTPROC = System.IntPtr;
-using Point = System.Windows.Point;
 using RedAlertUI.ViewModels;
+using RedAlertUI.WindowsUtil;
 
 namespace RedAlert
 {
@@ -20,10 +16,25 @@ namespace RedAlert
 
         public MainWindow()
         {
+
+#if DEBUG
+            User32.InitConsole();
+#endif
+
             InitializeComponent();
 
+            //VM.Recorder.RecordingStarted += delegate
+            //{
+                
+            //};
+
+            //VM.Recorder.RecordingStopped += delegate
+            //{
+
+            //};
+
             // Try to get the ark window apon launch
-            VM.ScanForArkWindow();
+            VM.Recorder.ScanForArkWindow();            
         }
     }
 }

@@ -4,6 +4,28 @@
              xmlns:local="clr-namespace:RedAlert"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <Style x:Key="MainWindow" TargetType="Window">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Grid>
+                            <Border x:Name="MainBorder"
+                                BorderBrush="Yellow">
+                            </Border>
+
+                            <!-- Title bar separator-->
+                            <Border Height="1" 
+                                    DockPanel.Dock="Top" 
+                                    Background="Red" />
+
+                            <!-- Actual Window Content -->
+                            <AdornerDecorator DockPanel.Dock="Bottom">
+                                <ContentPresenter />
+                            </AdornerDecorator>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Application.Resources>
 </Application>

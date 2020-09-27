@@ -7,8 +7,11 @@
     <Platforms>AnyCPU</Platforms>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
-    <Folder Include="Lang\" />
     <Folder Include="WindowsUtil\" />
     <Folder Include="ViewModels\" />
   </ItemGroup>

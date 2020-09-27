@@ -5,13 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RedAlert"
         mc:Ignorable="d"
-        xmlns:vm="clr-namespace:RedAlertUI.ViewModels"
+        xmlns:vm="clr-namespace:RedAlertUI.ViewModels"        
         Title="MainWindow" Height="450" Width="400">
 
     <Window.DataContext>
         <vm:MainWindowVM/>
     </Window.DataContext>
-    
+
     <Grid Margin="5">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -19,10 +19,12 @@
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="30"/>
+            <RowDefinition Height="30"/>
         </Grid.RowDefinitions>
 
         <Button Content="Scan For Ark Window"
                 Command="{Binding SetRecordingWindowCommand}"/>
         <Label Content="{Binding ActiveWindowTxt}" Grid.Column="1" VerticalAlignment="Center"/>
+        <Label Content="{Binding Recorder.IsRecording}" Grid.Row="1" VerticalAlignment="Center"/>
     </Grid>
 </Window>
