@@ -1,8 +1,10 @@
-﻿using RedAlertBot.Lang;
+﻿using NumSharp.Extensions;
+using RedAlertBot.Lang;
 using RedAlertBot.Util;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Timers;
 using HWND = System.IntPtr;
@@ -17,10 +19,13 @@ namespace RedAlertBot
         #region Constants
         private const string ARK_WINDOW_TITLE = "ARK: Survival Evolved";
         public const int DEFAULT_TIMER_INTERVAL = 2000;
-        #endregion        
+
+        private float TRIBELOG_BOX_X_PERCENTAGE = 0.693f;
+        private float TRIBELOG_BOX_Y_PERCENTAGE = 0.2f;
+        #endregion
 
         #region Events
-        public event EventHandler<ImageRecordingEventArgs> RecordingStateChanged;                        // Recording of target window has changed
+        public event EventHandler<ImageRecordingEventArgs> RecordingStateChanged;                   // Recording of target window has changed
         public event EventHandler<TargetWindowDiscoveredChangedArgs> TargetWindowDiscoveredChanged; // Target window value has changed
         #endregion
 
@@ -62,14 +67,25 @@ namespace RedAlertBot
             private set
             {
                 if (IsRecording == value) return;
-                isRecording = value;
-                RecordingStateChanged?.Invoke(this, new ImageRecordingEventArgs(isRecording));
-                NotifyPropertyChanged();
+
+                if (value == true && TargetWindowHWND != HWND.Zero)
+                {
+                    isRecording = value;
+                    RecordingTimer.Start();
+                    NotifyPropertyChanged();
+                }                
+                else
+                {
+                    isRecording = false;
+                    RecordingTimer.Stop();
+                    NotifyPropertyChanged();
+                }
+                RecordingStateChanged?.Invoke(this, new ImageRecordingEventArgs(IsRecording));
             }
         }
 
-        public NotifyingRect RecordingAreaOffset { get; set; }
-        public NotifyingRect RecordingAreaOrigin { get; private set; }
+        public Rectangle TargetWindowRect { get; set; }
+
         #endregion
 
         public ImageRecorder(RedAlertBot _bot)
@@ -85,52 +101,105 @@ namespace RedAlertBot
                     IsRecording = false;
             };
             RecordingTimer.Elapsed += RecordingTimer_Elapsed;
-            // Toggle the recording when the recording state changes
-            RecordingStateChanged += (sender, args) =>
-            {
-                if (args.IsRecording)
-                    RecordingTimer.Start();
-                else                
-                    RecordingTimer.Stop();                
-            };
-            // Update the recording area origin rect when the target window is discovered or lost
             TargetWindowDiscoveredChanged += delegate
             {
                 _ = WindowsUtil.GetWindowRect(TargetWindowHWND, out RECT sRect);
-                RecordingAreaOrigin = new NotifyingRect(sRect);
+                TargetWindowRect = new Rectangle(sRect.left, sRect.top, sRect.right - sRect.left, sRect.bottom - sRect.top);
             };
         }
 
         private void RecordingTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            SaveBitmap(CaptureWindowBitmap());
+            CaptureWindowBitmap();
+            //SaveBitmap(CaptureWindowBitmap());
 
 #if DEBUG
-            Predictor.PredictImage("../../ss.jpeg");            
+            //Predictor.PredictImage("../../ss.jpeg");            
 #else
             throw new NotImplementedException();
 #endif
 
         }
 
-        private Bitmap CaptureWindowBitmap()
-        {
-            _ = WindowsUtil.GetWindowRect(TargetWindowHWND, out RECT sRect);
-            RecordingAreaOrigin = new NotifyingRect(sRect);
+        //private Bitmap CaptureWindowBitmap()
+        //{
+        //    ActiveImg = null;
+        //    Bitmap bmp;
 
-            Bitmap bmp = new Bitmap(sRect.right - sRect.left, sRect.bottom - sRect.top, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+        //    _ = WindowsUtil.GetWindowRect(TargetWindowHWND, out RECT sRect);
+
+        //    int width = (int)((sRect.right - sRect.left) * WidthPercentage);
+        //    int height = (int)((sRect.bottom - sRect.top) * HeightPercentage);
+
+        //    bmp = new Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+
+        //    Graphics gfxBmp = Graphics.FromImage(bmp);
+        //    gfxBmp.CopyFromScreen(sRect.left + 400, sRect.top + 400, 0, 0, new Size(width, height));
+        //    //HWND hdcBitmap = gfxBmp.GetHdc();
+
+        //    //WindowsUtil.PrintWindow(TargetWindowHWND, hdcBitmap, 0);
+        //    //gfxBmp.ReleaseHdc(hdcBitmap);
+        //    //gfxBmp.Dispose();
+
+        //    try
+        //    {
+        //        // Comment this line below to have the program work.
+        //        bmp = bmp.Clone(new Rectangle(100, 100, 200, 200), System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //    }
+        //    finally
+        //    {
+        //        bmp.Save("test.jpeg");
+        //        bmp.Dispose();
+        //        ActiveImg = new Uri(@"C:\Dev\RedAlert\RedAlert\bin\Debug\netcoreapp3.1\test.jpeg");
+        //        NotifyPropertyChanged(nameof(ActiveImg));
+        //    }
+        //    return bmp;
+        //}
+        
+        private void CaptureWindowBitmap()
+        {
+            Bitmap bmp;
+            Bitmap copyBmp;
+            _ = WindowsUtil.GetWindowRect(TargetWindowHWND, out RECT sRect);
+
+            int width = sRect.right - sRect.left;
+            int height = sRect.bottom - sRect.top;
+
+            bmp = new Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+
             Graphics gfxBmp = Graphics.FromImage(bmp);
             HWND hdcBitmap = gfxBmp.GetHdc();
 
-            WindowsUtil.PrintWindow(TargetWindowHWND, hdcBitmap, 0);
+            WindowsUtil.PrintWindow(TargetWindowHWND, hdcBitmap, 0);            
             gfxBmp.ReleaseHdc(hdcBitmap);
             gfxBmp.Dispose();
-            return bmp;
+            
+            try
+            {                
+                Rectangle rect = new Rectangle(0, 0, 146, 269);
+                // Comment this line below to have the program work.
+                copyBmp = bmp.Clone(rect, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+                                
+                copyBmp.Save("copyBmp.jpeg");
+                copyBmp.Dispose();
+            }
+            catch (Exception ex)
+            {                
+            }
+            finally
+            {
+                bmp.Save("test.jpeg");
+                bmp.Dispose();
+            }           
         }
 
         private void SaveBitmap(Bitmap bitmap)
         {
             bitmap.Save("ss.jpeg");
+            bitmap.Dispose();
         }
         
 

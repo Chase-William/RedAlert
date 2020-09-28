@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:RedAlert"
         mc:Ignorable="d"
         xmlns:vm="clr-namespace:RedAlert.ViewModels"        
-        Title="MainWindow" Height="450" Width="400">
+        Title="MainWindow" Height="600" Width="500">
 
     <Window.DataContext>
         <vm:MainWindowVM/>
@@ -24,7 +24,7 @@
             <!-- Recording Controls -->
             <RowDefinition Height="30"/>
             <RowDefinition Height="30"/>
-            <RowDefinition Height="200"/>
+            <RowDefinition Height="30"/>
         </Grid.RowDefinitions>
 
         <Button Content="Scan For Ark Window"
@@ -41,9 +41,6 @@
                       Command="{Binding ToggleBotCommand}"/>
         <ComboBox Grid.Row="2" ItemsSource="{Binding MODES}"/>
 
-        <Slider Minimum="{Binding Bot.Recorder.RecordingAreaOrigin.X}" Value="{Binding Bot.Recorder.RecordingAreaOffset.Width}" Maximum="{Binding Bot.Recorder.RecordingAreaOrigin.Width}" Grid.Row="3"/>
-        <Slider Minimum="{Binding Bot.Recorder.RecordingAreaOrigin.Y}" Value="{Binding Bot.Recorder.RecordingAreaOffset.Height}" Maximum="{Binding Bot.Recorder.RecordingAreaOrigin.Height}" Grid.Row="4"/>
-
-        <Image Grid.Row="5" Grid.ColumnSpan="2" Source="ss.jepg"/>
+        <Button Content="Set Tribe Log Rectangle" Click="OnSetTribeLogRect_BtnClicked" Grid.Row="5"/>
     </Grid>
 </Window>

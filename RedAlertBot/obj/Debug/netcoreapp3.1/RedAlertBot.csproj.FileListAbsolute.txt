@@ -1,7 +1,3 @@
-C:\Dev\RedAlert\RedAlertBot\obj\Debug\netcoreapp3.1\RedAlertBot.csprojAssemblyReference.cache
-C:\Dev\RedAlert\RedAlertBot\obj\Debug\netcoreapp3.1\RedAlertBot.AssemblyInfoInputs.cache
-C:\Dev\RedAlert\RedAlertBot\obj\Debug\netcoreapp3.1\RedAlertBot.AssemblyInfo.cs
-C:\Dev\RedAlert\RedAlertBot\obj\Debug\netcoreapp3.1\RedAlertBot.csproj.CoreCompileInputs.cache
 C:\Dev\RedAlert\RedAlertBot\bin\Debug\netcoreapp3.1\assets\images\spino_1.jpg
 C:\Dev\RedAlert\RedAlertBot\bin\Debug\netcoreapp3.1\assets\images\spino_10.jpg
 C:\Dev\RedAlert\RedAlertBot\bin\Debug\netcoreapp3.1\assets\images\spino_11.jpg
@@ -56,6 +52,10 @@ C:\Dev\RedAlert\RedAlertBot\bin\Debug\netcoreapp3.1\RedAlertBot.dll
 C:\Dev\RedAlert\RedAlertBot\bin\Debug\netcoreapp3.1\RedAlertBot.pdb
 C:\Dev\RedAlert\RedAlertBot\bin\Debug\netcoreapp3.1\RedLearner.dll
 C:\Dev\RedAlert\RedAlertBot\bin\Debug\netcoreapp3.1\RedLearner.pdb
+C:\Dev\RedAlert\RedAlertBot\obj\Debug\netcoreapp3.1\RedAlertBot.csprojAssemblyReference.cache
+C:\Dev\RedAlert\RedAlertBot\obj\Debug\netcoreapp3.1\RedAlertBot.AssemblyInfoInputs.cache
+C:\Dev\RedAlert\RedAlertBot\obj\Debug\netcoreapp3.1\RedAlertBot.AssemblyInfo.cs
+C:\Dev\RedAlert\RedAlertBot\obj\Debug\netcoreapp3.1\RedAlertBot.csproj.CoreCompileInputs.cache
 C:\Dev\RedAlert\RedAlertBot\obj\Debug\netcoreapp3.1\RedAlertBot.csproj.CopyComplete
 C:\Dev\RedAlert\RedAlertBot\obj\Debug\netcoreapp3.1\RedAlertBot.dll
 C:\Dev\RedAlert\RedAlertBot\obj\Debug\netcoreapp3.1\RedAlertBot.pdb
