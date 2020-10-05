@@ -10,7 +10,7 @@
         "projectUniqueName": "C:\\Dev\\RedAlert\\RedAlertBot\\RedAlertBot.csproj",
         "projectName": "RedAlertBot",
         "projectPath": "C:\\Dev\\RedAlert\\RedAlertBot\\RedAlertBot.csproj",
-        "packagesPath": "C:\\Users\\Chase Roth\\.nuget\\packages\\",
+        "packagesPath": "C:\\Users\\cxr69\\.nuget\\packages\\",
         "outputPath": "C:\\Dev\\RedAlert\\RedAlertBot\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
@@ -18,7 +18,7 @@
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
         ],
         "configFilePaths": [
-          "C:\\Users\\Chase Roth\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\cxr69\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
         ],
@@ -61,7 +61,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.401\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.402\\RuntimeIdentifierGraph.json"
         }
       }
     },
@@ -71,7 +71,7 @@
         "projectUniqueName": "C:\\Dev\\RedAlert\\RedLearner\\RedLearner.csproj",
         "projectName": "RedLearner",
         "projectPath": "C:\\Dev\\RedAlert\\RedLearner\\RedLearner.csproj",
-        "packagesPath": "C:\\Users\\Chase Roth\\.nuget\\packages\\",
+        "packagesPath": "C:\\Users\\cxr69\\.nuget\\packages\\",
         "outputPath": "C:\\Dev\\RedAlert\\RedLearner\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
@@ -79,7 +79,7 @@
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
         ],
         "configFilePaths": [
-          "C:\\Users\\Chase Roth\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\cxr69\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
         ],
@@ -112,6 +112,10 @@
               "target": "Package",
               "version": "[1.5.1, )"
             },
+            "Microsoft.ML.OnnxTransformer": {
+              "target": "Package",
+              "version": "[1.5.1, )"
+            },
             "Microsoft.ML.TensorFlow": {
               "target": "Package",
               "version": "[1.5.1, )"
@@ -136,7 +140,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.401\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.402\\RuntimeIdentifierGraph.json"
         }
       }
     }
