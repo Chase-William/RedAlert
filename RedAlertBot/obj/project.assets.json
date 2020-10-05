@@ -6022,7 +6022,7 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Chase Roth\\.nuget\\packages\\": {},
+    "C:\\Users\\cxr69\\.nuget\\packages\\": {},
     "C:\\Microsoft\\Xamarin\\NuGet\\": {},
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
@@ -6032,7 +6032,7 @@
       "projectUniqueName": "C:\\Dev\\RedAlert\\RedAlertBot\\RedAlertBot.csproj",
       "projectName": "RedAlertBot",
       "projectPath": "C:\\Dev\\RedAlert\\RedAlertBot\\RedAlertBot.csproj",
-      "packagesPath": "C:\\Users\\Chase Roth\\.nuget\\packages\\",
+      "packagesPath": "C:\\Users\\cxr69\\.nuget\\packages\\",
       "outputPath": "C:\\Dev\\RedAlert\\RedAlertBot\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
@@ -6040,7 +6040,7 @@
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
-        "C:\\Users\\Chase Roth\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\cxr69\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
       ],
@@ -6083,7 +6083,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.401\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.402\\RuntimeIdentifierGraph.json"
       }
     }
   }

@@ -5,30 +5,16 @@
              xmlns:converters="clr-namespace:RedAlert.Converters"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-        <Style x:Key="MainWindow" TargetType="Window">
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate>
-                        <Grid>
-                            <Border x:Name="MainBorder"
-                                BorderBrush="Yellow">
-                            </Border>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- MahApps.Metro resource dictionaries. Make sure that all file names are Case Sensitive! -->
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
+                <!-- Theme setting -->
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/Light.Blue.xaml" />
+            </ResourceDictionary.MergedDictionaries>
 
-                            <!-- Title bar separator-->
-                            <Border Height="1" 
-                                    DockPanel.Dock="Top" 
-                                    Background="Red" />
-
-                            <!-- Actual Window Content -->
-                            <AdornerDecorator DockPanel.Dock="Bottom">
-                                <ContentPresenter />
-                            </AdornerDecorator>
-                        </Grid>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <converters:BoolToStringConverter x:Key="BoolToStringConverter"/>
+            <converters:BoolToStringConverter x:Key="BoolToStringConverter"/>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>
