@@ -1,9 +1,11 @@
 #Directories to ignore
 
 .vs/
-RedAlert/bin
-RedAlert/obj
-RedAlertBot/bin
-RedAlertBot/obj
-RedLearner/bin
-RedLearner/obj
+RedAlert/bin/
+RedAlert/obj/
+RedAlertBot/bin/
+RedAlertBot/obj/
+RedLearner/bin/
+RedLearner/obj/
+RedLearnerTester/bin/
+RedLearnerTester/obj/

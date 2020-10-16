@@ -30,5 +30,6 @@
         </Style>
 
         <converters:BoolToStringConverter x:Key="BoolToStringConverter"/>
+        <converters:PointToStringConverter x:Key="PointToStringConverter"/>
     </Application.Resources>
 </Application>

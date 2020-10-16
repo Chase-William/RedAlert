@@ -47,12 +47,12 @@ namespace RedAlert.ViewModels
 
         public MainWindowVM()
         {            
-            ActiveWindowTxt = "NULL";            
-            SetRecordingWindowCommand = new Command(Bot.Recorder.ScanForArkWindow);
-            Bot.Recorder.TargetWindowDiscoveredChanged += (sender, args) =>
-            {
-                ActiveWindowTxt = args.WindowHWND.ToString();
-            };
+            //ActiveWindowTxt = "NULL";            
+            //SetRecordingWindowCommand = new Command(Bot.Recorder.ScanForArkWindow);
+            //Bot.Recorder.TargetWindowDiscoveredChanged += (sender, args) =>
+            //{
+            //    ActiveWindowTxt = args.WindowHWND.ToString();
+            //};
         }                
     }    
 }

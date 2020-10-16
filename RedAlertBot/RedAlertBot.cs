@@ -1,7 +1,9 @@
 ﻿using RedAlertBot.Util;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Text;
+using HWND = System.IntPtr;
 
 namespace RedAlertBot
 {
@@ -34,6 +36,8 @@ namespace RedAlertBot
         }
 
         public ImageRecorder Recorder { get; set; }
+        
+        internal WindowsUtil WindowUtility { get; set; }
         #endregion
 
         private RedAlertBot()
@@ -50,7 +54,23 @@ namespace RedAlertBot
             WindowsUtil.CloseConsole();
 #endif
         }
-    }
+
+        /// <summary>
+        /// Initializes the RedAlert bot.
+        /// </summary>
+        /// <param name="sourceWindow">The window the hotkey should hook into</param>
+        /// <returns>Boolean indicating a successful or failure to initialize</returns>
+        public bool Init(HWND sourceWindow)
+        {
+            bot.Recorder.TargetWindowHWND = WindowsUtil.FindWindowA(null, "ARK: Survival Evolved");
+            WindowUtility = new WindowsUtil(sourceWindow);
+            if (bot.Recorder.TargetWindowHWND != HWND.Zero && WindowUtility != null)
+            {
+                return true;
+            }
+            return false;
+        }
+    }   
 
     public class BotIsEnabledChangedArgs : EventArgs
     {

@@ -1,0 +1,181 @@
+﻿<Page x:Class="RedAlert.SetupBloodPumperPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:RedAlert"
+      mc:Ignorable="d"
+      xmlns:vm="clr-namespace:RedAlert.ViewModels"
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="Setup Blood Pumper"
+      Background="White">
+
+    <Page.DataContext>
+        <vm:SetupBloodPumpVM/>
+    </Page.DataContext>
+    
+    <Page.Resources>
+        <ResourceDictionary>
+            <Style TargetType="StackPanel">
+                <Setter Property="Orientation" Value="Horizontal"/>
+            </Style>
+            <Style TargetType="Button">
+                <Setter Property="Padding" Value="10,0"/>
+            </Style>
+        </ResourceDictionary>
+    </Page.Resources>
+    
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="30"/>
+        </Grid.RowDefinitions>
+
+        <!-- Status -->
+        <Label Content="Toggle Status:"/>
+        <Label Content="{Binding IsEnabled, Converter={StaticResource BoolToStringConverter}}"
+               Grid.Column="1"/>
+        <Button Content="Toggle" 
+                Command="{Binding ToggleCommand}"
+                Grid.Column="2"/>
+         
+        <!-- Respawn Searchbar Location -->
+        <Label Content="Respawn Search Bar Location:"
+               Grid.Row="1"/>
+        <Label Content="{Binding BloodPumper.RespawnSearchBarLocation, Converter={StaticResource PointToStringConverter}}"
+               Grid.Row="1"
+               Grid.Column="1"/>
+        <Button Content="Set" 
+                Command="{Binding SetLocationCommand}" 
+                CommandParameter="rsbl"
+                Grid.Row="1" 
+                Grid.Column="2"/>
+
+        <!-- Bed Name -->
+        <Label Content="Bed Name:"
+               Grid.Row="2"/>
+        <Label Content="{Binding BloodPumper.BedName, Mode=TwoWay}"
+               Grid.Row="2"
+               Grid.Column="1"/>
+        <TextBox x:Name="bedNameTextBox"
+                 Text="{Binding BloodPumper.BedName, Mode=TwoWay}"
+                 TextChanged="TextBox_TextChanged"                
+                 Grid.Row="2" 
+                 Grid.Column="2"/>
+        
+        <!-- Bed Location -->
+        <Label Content="Bed Location:"
+               Grid.Row="3"/>
+        <Label Content="{Binding BloodPumper.BedLocation, Converter={StaticResource PointToStringConverter}}"
+               Grid.Row="3"
+               Grid.Column="1"/>
+        <Button Content="Set"
+                Command="{Binding SetLocationCommand}"
+                CommandParameter="bl"
+                Grid.Row="3" 
+                Grid.Column="2"/>
+        
+        <!-- Respawn Btn Location -->
+        <Label Content="Respawn Btn Location:"
+               Grid.Row="4"/>
+        <Label Content="{Binding BloodPumper.RespawnBtnLocation, Converter={StaticResource PointToStringConverter}}"
+               Grid.Row="4"
+               Grid.Column="1"/>
+        <Button Content="Set"
+                Command="{Binding SetLocationCommand}"
+                CommandParameter="rbl"
+                Grid.Row="4" 
+                Grid.Column="2"/>
+
+        <!-- Vault first slot -->
+        <Label Content="Other First Slot Location:"
+               Grid.Row="5"/>
+        <Label Content="{Binding BloodPumper.OtherInventFirstSlotLocation, Converter={StaticResource PointToStringConverter}}"
+               Grid.Row="5"
+               Grid.Column="1"/>
+        <Button Content="Set"
+                Command="{Binding SetLocationCommand}"
+                CommandParameter="oifsl"
+                Grid.Row="5"
+                Grid.Column="2"/>
+        
+        <!-- Your inventory Searchbar -->
+        <Label Content="Your Searchbar Location:"
+               Grid.Row="6"/>
+        <Label Content="{Binding BloodPumper.InventSearchbarLocation, Converter={StaticResource PointToStringConverter}}"
+               Grid.Row="6"
+               Grid.Column="1"/>
+        <Button Content="Set"
+                Command="{Binding SetLocationCommand}"
+                CommandParameter="isbl"
+                Grid.Row="6"
+                Grid.Column="2"/>
+
+        <!-- Your inventory first slot -->
+        <Label Content="Your First Slot Location:"
+               Grid.Row="7"/>
+        <Label Content="{Binding BloodPumper.InventFirstSlotLocation, Converter={StaticResource PointToStringConverter}}"
+               Grid.Row="7"
+               Grid.Column="1"/>
+        <Button Content="Set"
+                Command="{Binding SetLocationCommand}"
+                CommandParameter="ifsl"
+                Grid.Row="7"
+                Grid.Column="2"/>
+
+        <!-- Your inventory transfer all btn -->
+        <Label Content="Your Transfer All Btn Location:"
+               Grid.Row="8"/>
+        <Label Content="{Binding BloodPumper.TransferAllBtnLocation, Converter={StaticResource PointToStringConverter}}"
+               Grid.Row="8"
+               Grid.Column="1"/>
+        <Button Content="Set"
+                Command="{Binding SetLocationCommand}"
+                CommandParameter="itabl"
+                Grid.Row="8"
+                Grid.Column="2"/>
+
+        <!-- Death beds -->
+        <Label Content="Death Beds Location:"
+               Grid.Row="9"/>
+        <Label Content="{Binding BloodPumper.DeathBedsLocation, Converter={StaticResource PointToStringConverter}}"
+               Grid.Row="9"
+               Grid.Column="1"/>
+        <Button Content="Set"
+                Command="{Binding SetLocationCommand}"
+                CommandParameter="dbl"
+                Grid.Row="9"
+                Grid.Column="2"/>
+
+        <!-- Uses before death -->
+        <Label Content="Uses Before Death:"
+               Grid.Row="10"/>
+        <Label Content="{Binding BloodPumper.UsesBeforeDeath}"
+               Grid.Row="10"
+               Grid.Column="1"/>
+        <TextBox x:Name="usesBeforeDeathTextBox"
+                 Text="{Binding BloodPumper.UsesBeforeDeath, Mode=OneWay}"
+                 TextChanged="TextBox_TextChanged"                 
+                 Grid.Row="10"
+                 Grid.Column="2"/>
+
+        <Button Content="Save"
+                Command="{Binding SaveCommand}"
+                Grid.Row="11"/>
+    </Grid>
+</Page>

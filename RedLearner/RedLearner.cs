@@ -10,9 +10,9 @@ namespace RedLearner
     public class RedLearner
     {
         static readonly string _assetsPath = Path.Combine(Environment.CurrentDirectory, "assets");
-        static readonly string _imagesFolder = Path.Combine(_assetsPath, "images");
+        static readonly string _imagesFolder = Path.Combine(_assetsPath, "images_regression");
         static readonly string _trainTagsTsv = Path.Combine(_imagesFolder, "tags.tsv");
-        static readonly string _testTagsTsv = Path.Combine(_imagesFolder, "test-tags.tsv");
+        //static readonly string _testTagsTsv = Path.Combine(_imagesFolder, "test-tags.tsv");
         static readonly string _inceptionTensorFlowModel = Path.Combine(_assetsPath, "inception", "tensorflow_inception_graph.pb");
 
         private MLContext mlContext;
@@ -76,7 +76,10 @@ namespace RedLearner
                 // Make prediction function (input = ImageData, output = ImagePrediction)
                 var predictor = mlContext.Model.CreatePredictionEngine<ImageData, ImagePrediction>(model);
                 var prediction = predictor.Predict(imageData);
-                return $"Image: {Path.GetFileName(imageData.ImagePath)} predicted as: {prediction.PredictedLabelValue} with score: {prediction.Score.Max()} ";
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine($"Image: {Path.GetFileName(imageData.ImagePath)} predicted as: {prediction.PredictedLabelValue} with score: {prediction.Score.Max()} ");
+                Console.ForegroundColor = ConsoleColor.White;
+                return prediction.PredictedLabelValue;
             }            
             catch (Exception ex)
             {
@@ -104,22 +107,22 @@ namespace RedLearner
             ITransformer model = pipeline.Fit(trainingData);
 
             // load and transform test data
-            IDataView testData = mlContext.Data.LoadFromTextFile<ImageData>(path: _testTagsTsv, hasHeader: false);
-            IDataView predictions = model.Transform(testData);
+            //IDataView testData = mlContext.Data.LoadFromTextFile<ImageData>(path: _testTagsTsv, hasHeader: false);
+            //IDataView predictions = model.Transform(testData);
 
-            // Create an IEnumerable for the predictions for displaying results
-            IEnumerable<ImagePrediction> imagePredictionData = mlContext.Data.CreateEnumerable<ImagePrediction>(predictions, true);
-            DisplayResults(imagePredictionData);
+            //// Create an IEnumerable for the predictions for displaying results
+            //IEnumerable<ImagePrediction> imagePredictionData = mlContext.Data.CreateEnumerable<ImagePrediction>(predictions, true);
+            //DisplayResults(imagePredictionData);
 
-            // Evaluate()
-            // Assesses the model(compares the predicted values with the test dataset labels).
-            // Returns the model performance metrics.
-            MulticlassClassificationMetrics metrics = mlContext.MulticlassClassification.Evaluate(predictions,
-                labelColumnName: "LabelKey",
-                predictedLabelColumnName: "PredictedLabel");
+            //// Evaluate()
+            //// Assesses the model(compares the predicted values with the test dataset labels).
+            //// Returns the model performance metrics.
+            //MulticlassClassificationMetrics metrics = mlContext.MulticlassClassification.Evaluate(predictions,
+            //    labelColumnName: "LabelKey",
+            //    predictedLabelColumnName: "PredictedLabel");
 
-            Console.WriteLine($"LogLoss is: {metrics.LogLoss}");
-            Console.WriteLine($"PerClassLogLoss is: {String.Join(" , ", metrics.PerClassLogLoss.Select(c => c.ToString()))}");
+            //Console.WriteLine($"LogLoss is: {metrics.LogLoss}");
+            //Console.WriteLine($"PerClassLogLoss is: {String.Join(" , ", metrics.PerClassLogLoss.Select(c => c.ToString()))}");
 
             return model;
         }

@@ -1,22 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace RedAlert.Lang
 {
     public class Command : ICommand
     {
-        public event EventHandler CanExecuteChanged;
+        public delegate void Action<in T>(T optional = default);
 
-        public Action ActionToBeExecuted { get; set; }
+        public delegate void Action();
 
-        public Command(Action action)
-        {
-            ActionToBeExecuted = action;
-        }
+        public event EventHandler CanExecuteChanged;        
+
+        public RedAlert.Lang.Command.Action<object> ActionWithParam { get; set; }
+        public RedAlert.Lang.Command.Action ActionNoParam { get; set; }
+
+        public Command(Action action) => ActionNoParam = action;
+        public Command(Action<object> action) => ActionWithParam = action;
 
         public bool CanExecute(object parameter)
         {
@@ -25,7 +24,8 @@ namespace RedAlert.Lang
 
         public void Execute(object parameter)
         {
-            ActionToBeExecuted?.Invoke();
+            ActionNoParam?.Invoke();
+            ActionWithParam?.Invoke(parameter);
         }
     }
 }

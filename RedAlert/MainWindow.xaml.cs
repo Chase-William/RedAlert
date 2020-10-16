@@ -1,8 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows;
+using System.Windows.Interop;
 using RedAlert.ViewModels;
+using RedAlertBot;
+
 namespace RedAlert
 {
     /// <summary>
@@ -12,9 +16,12 @@ namespace RedAlert
     {
         MainWindowVM VM => (MainWindowVM)DataContext;
 
+        //public RedAlertBot.Util.WindowsUtil WindowsUtil { get; private set; }                
+
         public MainWindow()
         {
-            InitializeComponent();
+            InitializeComponent();            
+            Content = new SetupBloodPumperPage();
 
             //VM.Recorder.RecordingStarted += delegate
             //{
@@ -27,7 +34,23 @@ namespace RedAlert
             //};
 
             // Try to get the ark window apon launch
-            VM.Bot.Recorder.ScanForArkWindow();            
+            //VM.Bot.Recorder.ScanForArkWindow();            
         }
+
+        protected override void OnSourceInitialized(EventArgs e)
+        {
+            base.OnSourceInitialized(e);
+
+            //WindowsUtil = new RedAlertBot.Util.WindowsUtil(new WindowInteropHelper(this).Handle);
+
+            // Init our bot
+            if (!RedAlertBot.RedAlertBot.Bot.Init(new WindowInteropHelper(this).Handle))
+            {
+                Console.WriteLine("FAILURE: Failed to initialize.");                
+            }
+
+            App.Source = HwndSource.FromHwnd(RedAlertBot.Util.WindowsUtil.SourceWindow);
+            App.Source.AddHook(RedAlertBot.Util.WindowsUtil.ToggleHooks);            
+        }        
     }
 }

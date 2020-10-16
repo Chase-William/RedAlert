@@ -29,7 +29,7 @@ namespace RedAlertBot
         #endregion
 
         #region Properties
-        public Timer RecordingTimer = new Timer(DEFAULT_TIMER_INTERVAL);
+        public Timer RecordingTimer { get; set; } = new Timer(DEFAULT_TIMER_INTERVAL);
 
         public ImagePredictor Predictor { get; set; } = new ImagePredictor();
 
@@ -45,26 +45,6 @@ namespace RedAlertBot
                 if (targetWindowHWND == value) return;
                 targetWindowHWND = value;
                 TargetWindowDiscoveredChanged?.Invoke(this, new TargetWindowDiscoveredChangedArgs(TargetWindowHWND));
-
-                // If the bot is disabled the recording cannot start
-                if (bot.IsBotEnabled)
-                    if (targetWindowHWND == HWND.Zero)
-                        IsRecording = false;                    
-                    else
-                        IsRecording = true;                    
-            }
-        }
-
-        private bool isRecording;
-        public bool IsRecording
-        {
-            get => isRecording;
-            private set
-            {
-                if (IsRecording == value) return;
-                isRecording = value;
-                RecordingStateChanged?.Invoke(this, new ImageRecordingEventArgs(isRecording));
-                NotifyPropertyChanged();
             }
         }
 
@@ -78,21 +58,11 @@ namespace RedAlertBot
             // If the bot has been disabled, notify the IsRecording state variable
             bot.BotIsEnabledChanged += (sender, args) =>
             {
-                // If the bot is disabled, turn off the recording
-                if (args.IsEnabled)
-                    IsRecording = true;
-                else
-                    IsRecording = false;
+                if (args.IsEnabled) RecordingTimer.Start();
+                else RecordingTimer.Stop();
             };
             RecordingTimer.Elapsed += RecordingTimer_Elapsed;
-            // Toggle the recording when the recording state changes
-            RecordingStateChanged += (sender, args) =>
-            {
-                if (args.IsRecording)
-                    RecordingTimer.Start();
-                else                
-                    RecordingTimer.Stop();                
-            };
+
             // Update the recording area origin rect when the target window is discovered or lost
             TargetWindowDiscoveredChanged += delegate
             {
@@ -103,36 +73,34 @@ namespace RedAlertBot
 
         private void RecordingTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            SaveBitmap(CaptureWindowBitmap());
-
-#if DEBUG
-            Predictor.PredictImage("../../ss.jpeg");            
-#else
-            throw new NotImplementedException();
-#endif
-
+            Bitmap bmp = CaptureWindowBitmap();
+            bmp.Save("ss.jpeg");
+            bmp.Dispose();
+            Predictor.PredictImage("../../ss.jpeg");
         }
 
         private Bitmap CaptureWindowBitmap()
         {
-            _ = WindowsUtil.GetWindowRect(TargetWindowHWND, out RECT sRect);
-            RecordingAreaOrigin = new NotifyingRect(sRect);
+            try
+            {
+                _ = WindowsUtil.GetWindowRect(TargetWindowHWND, out RECT sRect);
+                RecordingAreaOrigin = new NotifyingRect(sRect);
 
-            Bitmap bmp = new Bitmap(sRect.right - sRect.left, sRect.bottom - sRect.top, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-            Graphics gfxBmp = Graphics.FromImage(bmp);
-            HWND hdcBitmap = gfxBmp.GetHdc();
+                Bitmap bmp = new Bitmap(sRect.right - sRect.left, sRect.bottom - sRect.top, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                Graphics gfxBmp = Graphics.FromImage(bmp);
+                HWND hdcBitmap = gfxBmp.GetHdc();
 
-            WindowsUtil.PrintWindow(TargetWindowHWND, hdcBitmap, 0);
-            gfxBmp.ReleaseHdc(hdcBitmap);
-            gfxBmp.Dispose();
-            return bmp;
+                WindowsUtil.PrintWindow(TargetWindowHWND, hdcBitmap, WindowsUtil.CLEINT_ONLY_AREA_FLAG);
+                gfxBmp.ReleaseHdc(hdcBitmap);
+                gfxBmp.Dispose();
+                return bmp;
+            }            
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            return null;
         }
-
-        private void SaveBitmap(Bitmap bitmap)
-        {
-            bitmap.Save("ss.jpeg");
-        }
-        
 
         /// <summary>
         /// Tries to retrieve the HWND for the Ark Survival Evolved window.
