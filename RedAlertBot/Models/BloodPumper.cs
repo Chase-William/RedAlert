@@ -12,6 +12,8 @@ using System.IO;
 using System.Text.Json.Serialization;
 using System.Threading;
 using System.Timers;
+using System.Security.Cryptography.X509Certificates;
+using RedLearner;
 
 namespace RedAlertBot.Models
 {
@@ -24,8 +26,8 @@ namespace RedAlertBot.Models
     {
         private const string FILE_NAME = "bloodpumper.json";
         private const int OPEN_INVENT_TIMER_INTERVAL = 2000;
-        private const int SCAN_WHILE_TURNING_TIMER_INTERVAL = 500;
-
+        private const int SCAN_WHILE_TURNING_TIMER_INTERVAL = 250;
+        private const float THRESHOLD = 0.90f;
 
         private System.Timers.Timer timer = new System.Timers.Timer(200);
         private int Counter { get; set; }
@@ -166,65 +168,7 @@ namespace RedAlertBot.Models
             //        Finish();
             //    }
             //};
-        }
-
-        /// <summary>
-        /// 1. Close inventory
-        /// </summary>
-        private async void Finish()
-        {
-            await Task.Run(() => {
-                try
-                {
-                    // depo syringe
-                    Task.Delay(200).Wait();
-                    WindowsUtil.PerformMouseClick(TransferAllBtnLocation);
-                    Task.Delay(200).Wait();
-                    WindowsUtil.PerformKeyboardClick(KeyboardVKs.F);
-
-                    // Closing self inventory and depo blood in vault
-                    Task.Delay(200).Wait();
-                    WindowsUtil.PerformKeyboardClick(KeyboardVKs.F);
-                    Task.Delay(200).Wait();
-
-                    BeginOpenFridgeProcess();
-
-                    //WindowsUtil.keybd_event((byte)KeyboardVKs.LEFT_ARROW, 0, WindowsUtil.KEYEVENTF_EXTENDEDKEY, 0);
-                    ////WindowsUtil.SendMessage(WindowsUtil.TargetWindow, WindowsUtil.KEYEVENTF_KEYDOWN, (uint)KeyboardVKs.LEFT_ARROW, 0);
-                    //Task.Delay(920).Wait();
-                    //WindowsUtil.keybd_event((byte)KeyboardVKs.LEFT_ARROW, 0, WindowsUtil.KEYEVENTF_EXTENDEDKEY | WindowsUtil.KEYEVENTF_KEYUP, 0);
-                    ////WindowsUtil.SendMessage(WindowsUtil.TargetWindow, WindowsUtil.KEYEVENTF_KEYUP, (uint)KeyboardVKs.LEFT_ARROW, 0);
-                    //Task.Delay(200).Wait();
-                    //WindowsUtil.PerformKeyboardClick(KeyboardVKs.F);
-                    //Task.Delay(2000).Wait();
-                    //WindowsUtil.PerformMouseClick(TransferAllBtnLocation);
-                    //Task.Delay(200).Wait();
-                    //WindowsUtil.PerformKeyboardClick(KeyboardVKs.F);
-
-                    // Look down to bed and respawn
-                    Task.Delay(200).Wait();
-                    WindowsUtil.keybd_event((byte)KeyboardVKs.DOWN_ARROW, 0, WindowsUtil.KEYEVENTF_EXTENDEDKEY, 0);
-                    Task.Delay(1800).Wait();
-                    WindowsUtil.keybd_event((byte)KeyboardVKs.DOWN_ARROW, 0, WindowsUtil.KEYEVENTF_EXTENDEDKEY | WindowsUtil.KEYEVENTF_KEYUP, 0);
-                    Task.Delay(200).Wait();
-                    WindowsUtil.PerformKeyboardClick(KeyboardVKs.E);
-                    Task.Delay(1500).Wait();
-                    WindowsUtil.PerformMouseClick(RespawnSearchBarLocation);
-                    Task.Delay(200).Wait();
-                    WindowsUtil.PerformKeyboardClicks("BDEATH");
-                    Task.Delay(1000).Wait();
-                    WindowsUtil.PerformMouseClick(DeathBedsLocation);
-                    Task.Delay(1000).Wait();
-                    WindowsUtil.PerformMouseClick(RespawnBtnLocation);
-                    Task.Delay(15000).Wait();
-                    Begin();
-                }           
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                }
-            });  
-        }
+        }        
 
         /// <summary>
         /// 1. Move cursor to respawn searchbar
@@ -250,14 +194,16 @@ namespace RedAlertBot.Models
             {
                 try
                 {
-                    Task.Delay(1000).Wait();
-                    WindowsUtil.PerformMouseClick(RespawnSearchBarLocation);
-                    Task.Delay(100).Wait();
-                    WindowsUtil.PerformKeyboardClicks(BedName);
-                    Task.Delay(200).Wait();
-                    WindowsUtil.PerformMouseClick(BedLocation);
-                    Task.Delay(100).Wait();
-                    WindowsUtil.PerformMouseClick(RespawnBtnLocation);
+                    //Task.Delay(1000).Wait();
+                    //WindowsUtil.PerformMouseClick(RespawnSearchBarLocation);
+                    //Task.Delay(100).Wait();
+                    //WindowsUtil.PerformKeyboardClicks(BedName);
+                    //Task.Delay(200).Wait();
+                    //WindowsUtil.PerformMouseClick(BedLocation);
+                    //Task.Delay(100).Wait();
+                    //WindowsUtil.PerformMouseClick(RespawnBtnLocation);
+
+                    RespawnUsingBed(BedName, BedLocation);
 
                     // Open Vault UI
                     BeginOpenVaultProcess();
@@ -299,12 +245,12 @@ namespace RedAlertBot.Models
             void OnTryToOpenVault(object sender, UpdateTickEventArgs e)
             {
                 PrintAction(nameof(OnTryToOpenVault));
-                if (e.Value == ImgClasses.Vault)
+                if (e.Value.Class == ImgClasses.Vault)
                 {
                     Console.WriteLine("Identifed a vault.");
-                    OpenOtherInventory();
+                    WindowsUtil.PerformKeyboardClick(KeyboardVKs.F);
                 }
-                else if (e.Value == ImgClasses.Vault_UI)
+                else if (e.Value.Class == ImgClasses.Vault_UI)
                 {
                     Console.WriteLine("Identified vault inventory.");
                     RedAlertBot.Bot.Recorder.Predictor.UpdateTick -= OnTryToOpenVault;
@@ -340,13 +286,44 @@ namespace RedAlertBot.Models
         }
 
         /// <summary>
+        /// Fires everytime the bot or user should use the syringe to extract blood.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnTimerElasped_UseSyringe(object sender, ElapsedEventArgs e)
+        {
+            PrintAction(nameof(OnTimerElasped_UseSyringe));
+            if (Counter == UsesBeforeDeath)
+            {
+                timer.Stop();
+                timer.Elapsed -= OnTimerElasped_UseSyringe;
+                Counter = 0;
+                // Depo the syringe quickly
+                Task.Delay(2000).Wait();
+                WindowsUtil.PerformMouseClick(TransferAllBtnLocation);
+                Task.Delay(200).Wait();
+                WindowsUtil.PerformKeyboardClick(KeyboardVKs.F);
+                // Starting the opening fridge process
+                BeginOpenFridgeProcess();
+                return;
+            }
+            else
+            {
+                Counter++;
+                WindowsUtil.PerformKeyboardClick(KeyboardVKs.E);
+            }
+        }
+
+        /// <summary>
         /// Begins the process of intelligently trying to open the fridge's inventory.
         /// </summary>
         public void BeginOpenFridgeProcess()
         {
+            bool isInventoryOpen = false;
+
             PrintAction(nameof(BeginOpenFridgeProcess));
             RedAlertBot.Bot.IsBotEnabled = true;
-            RedAlertBot.Bot.Recorder.RecordingTimer.Interval = 250;
+            RedAlertBot.Bot.Recorder.RecordingTimer.Interval = SCAN_WHILE_TURNING_TIMER_INTERVAL;
             RedAlertBot.Bot.Recorder.Predictor.UpdateTick += OnTryToOpenFridge;
 
             //WindowsUtil.keybd_event((byte)KeyboardVKs.LEFT_ARROW, 0, WindowsUtil.KEYEVENTF_EXTENDEDKEY, 0);
@@ -355,39 +332,40 @@ namespace RedAlertBot.Models
             //WindowsUtil.keybd_event((byte)KeyboardVKs.LEFT_ARROW, 0, WindowsUtil.KEYEVENTF_EXTENDEDKEY | WindowsUtil.KEYEVENTF_KEYUP, 0);
             ////WindowsUtil.SendMessage(WindowsUtil.TargetWindow, WindowsUtil.KEYEVENTF_KEYUP, (uint)KeyboardVKs.LEFT_ARROW, 0);
             //Task.Delay(200).Wait();
-            //WindowsUtil.PerformKeyboardClick(KeyboardVKs.F);
-            Task.Delay(2000).Wait();
-            WindowsUtil.PerformMouseClick(TransferAllBtnLocation);
-            Task.Delay(200).Wait();
-            WindowsUtil.PerformKeyboardClick(KeyboardVKs.F);
+            //WindowsUtil.PerformKeyboardClick(KeyboardVKs.F);            
 
             void OnTryToOpenFridge(object sender, UpdateTickEventArgs e)
             {
                 PrintAction(nameof(OnTryToOpenFridge));
 
                 // Keep rotating the character for as long as we don't see the fridge and the fridge isnt open
-                if (e.Value != ImgClasses.Fridge && e.Value != ImgClasses.Fridge_UI)
-                {
-                    WindowsUtil.keybd_event((byte)KeyboardVKs.LEFT_ARROW, 0, WindowsUtil.KEYEVENTF_EXTENDEDKEY, 0);
-                    Console.WriteLine("Searching for fridge, continuing to provide Left Arrow input...");
-                }
-                else if (e.Value == ImgClasses.Fridge)
+                WindowsUtil.keybd_event((byte)KeyboardVKs.LEFT_ARROW, 0, WindowsUtil.KEYEVENTF_EXTENDEDKEY, 0);
+                Console.WriteLine("Searching for fridge.");                
+
+                if (e.Value.Class == ImgClasses.Fridge && e.Value.Confidence >= THRESHOLD)
                 {
                     Console.WriteLine("Identified a fridge.");
                     RedAlertBot.Bot.Recorder.RecordingTimer.Interval = OPEN_INVENT_TIMER_INTERVAL;
-                    RedAlertBot.Bot.Recorder.RecordingTimer.Stop();
-                    RedAlertBot.Bot.Recorder.RecordingTimer.Start();
                     WindowsUtil.keybd_event((byte)KeyboardVKs.LEFT_ARROW, 0, WindowsUtil.KEYEVENTF_EXTENDEDKEY | WindowsUtil.KEYEVENTF_KEYUP, 0);
                     WindowsUtil.PerformKeyboardClick(KeyboardVKs.F);
+                    isInventoryOpen = true;
                 }
-                else if (e.Value == ImgClasses.Fridge_UI)
+                else if (e.Value.Class == ImgClasses.Fridge_UI && e.Value.Confidence >= THRESHOLD)
                 {
                     Console.WriteLine("Identified fridge inventory.");
                     // Once the FridgeUI is open we can unsub
                     RedAlertBot.Bot.Recorder.Predictor.UpdateTick -= OnTryToOpenFridge;
                     RedAlertBot.Bot.IsBotEnabled = false;
                     DepositBloodBags();
-                }               
+                }
+                else if (e.Value.Class == ImgClasses.Vault_UI)
+                {
+                    if (!isInventoryOpen)
+                    {
+                        WindowsUtil.PerformKeyboardClick(KeyboardVKs.F);
+                        isInventoryOpen = false;
+                    }                    
+                }
             }
         }
 
@@ -401,31 +379,175 @@ namespace RedAlertBot.Models
             WindowsUtil.PerformMouseClick(TransferAllBtnLocation);
             Task.Delay(200).Wait();
             WindowsUtil.PerformKeyboardClick(KeyboardVKs.F);
-            Finish();
+            BeginTransferUsingnBedProcess();
+        }       
+
+        public void BeginTransferUsingnBedProcess()
+        {
+            bool isUIOpen = false;
+            int counter = 0;
+
+            PrintAction(nameof(BeginTransferUsingnBedProcess));
+            RedAlertBot.Bot.IsBotEnabled = true;
+            RedAlertBot.Bot.Recorder.RecordingTimer.Interval = SCAN_WHILE_TURNING_TIMER_INTERVAL;
+            RedAlertBot.Bot.Recorder.Predictor.UpdateTick += LookDownAtBed;            
+            
+            void LookDownAtBed(object sender, UpdateTickEventArgs e)
+            {
+                if (counter < 5)
+                {
+                    Console.WriteLine("Searching for bed.");
+                    WindowsUtil.keybd_event((byte)KeyboardVKs.DOWN_ARROW, 0, WindowsUtil.KEYEVENTF_EXTENDEDKEY, 0);
+                    counter++;
+                }
+                else
+                {
+                    RedAlertBot.Bot.Recorder.Predictor.UpdateTick -= LookDownAtBed;
+                    Console.WriteLine("Identified a bed.");
+                    WindowsUtil.keybd_event((byte)KeyboardVKs.DOWN_ARROW, 0, WindowsUtil.KEYEVENTF_EXTENDEDKEY | WindowsUtil.KEYEVENTF_KEYUP, 0);
+                    WindowsUtil.PerformKeyboardClick(KeyboardVKs.E);
+                    isUIOpen = true;
+                    RedAlertBot.Bot.Recorder.Predictor.UpdateTick += OnTryToTransferUsingBed;
+                }
+            }
+
+            void OnTryToTransferUsingBed(object sender, UpdateTickEventArgs e)
+            {
+                // If we are not looking at a fridge or in its ui, continue panning down
+                
+                //Console.WriteLine("Searching for bed.");
+                //WindowsUtil.keybd_event((byte)KeyboardVKs.DOWN_ARROW, 0, WindowsUtil.KEYEVENTF_EXTENDEDKEY, 0);
+                //if (e.Value.Class == ImgClasses.Bed && e.Value.Confidence >= THRESHOLD)
+                //{
+                //    Console.WriteLine("Identified a bed.");
+                //    WindowsUtil.keybd_event((byte)KeyboardVKs.DOWN_ARROW, 0, WindowsUtil.KEYEVENTF_EXTENDEDKEY | WindowsUtil.KEYEVENTF_KEYUP, 0);
+                //    WindowsUtil.PerformKeyboardClick(KeyboardVKs.E);
+                //    isUIOpen = true;
+                //}
+                if (e.Value.Class == ImgClasses.Bed_UI)
+                {
+                    Console.WriteLine("Identified bed UI.");
+                    RedAlertBot.Bot.Recorder.Predictor.UpdateTick -= OnTryToTransferUsingBed;
+                    RedAlertBot.Bot.IsBotEnabled = false;
+                    RespawnUsingBed("BDEATH", DeathBedsLocation);
+                    Task.Delay(15000).Wait();
+                    BeginRespawnProcess();
+                }
+                else if (e.Value.Class == ImgClasses.Fridge_UI || e.Value.Class == ImgClasses.Vault_UI)
+                {
+                    if (isUIOpen)
+                    {
+                        WindowsUtil.PerformKeyboardClick(KeyboardVKs.F);
+                        isUIOpen = false;
+                    }                    
+                }
+            }
+
+            //Task.Delay(200).Wait();
+            //WindowsUtil.keybd_event((byte)KeyboardVKs.DOWN_ARROW, 0, WindowsUtil.KEYEVENTF_EXTENDEDKEY, 0);
+            //Task.Delay(1800).Wait();
+            //WindowsUtil.keybd_event((byte)KeyboardVKs.DOWN_ARROW, 0, WindowsUtil.KEYEVENTF_EXTENDEDKEY | WindowsUtil.KEYEVENTF_KEYUP, 0);
+            //Task.Delay(200).Wait();
+            //WindowsUtil.PerformKeyboardClick(KeyboardVKs.E);
+            //Task.Delay(1500).Wait();
+            //WindowsUtil.PerformMouseClick(RespawnSearchBarLocation);
+            //Task.Delay(200).Wait();
+            //WindowsUtil.PerformKeyboardClicks("BDEATH");
+            //Task.Delay(1000).Wait();
+            //WindowsUtil.PerformMouseClick(DeathBedsLocation);
+            //Task.Delay(1000).Wait();
+            //WindowsUtil.PerformMouseClick(RespawnBtnLocation);
+        }
+
+        public void BeginRespawnProcess()
+        {
+            PrintAction(nameof(BeginRespawnProcess));
+            RedAlertBot.Bot.IsBotEnabled = true;
+            RedAlertBot.Bot.Recorder.RecordingTimer.Interval = SCAN_WHILE_TURNING_TIMER_INTERVAL;
+            RedAlertBot.Bot.Recorder.Predictor.UpdateTick += OnTryToRespawnUsingBed;
+
+            void OnTryToRespawnUsingBed(object sender, UpdateTickEventArgs e)
+            {
+                PrintAction(nameof(OnTryToRespawnUsingBed));
+                if (e.Value.Class == ImgClasses.Bed_UI)
+                {                    
+                    RedAlertBot.Bot.Recorder.Predictor.UpdateTick -= OnTryToRespawnUsingBed;
+                    RedAlertBot.Bot.IsBotEnabled = false;
+                    RespawnUsingBed("BLOOD", BedLocation);
+                    BeginOpenVaultProcess();
+                }
+            }
+        }
+
+        private void RespawnUsingBed(string bedName, Point bedLoc)
+        {
+            Console.WriteLine("Identified bed UI.");
+            WindowsUtil.PerformMouseClick(RespawnSearchBarLocation);
+            Task.Delay(200).Wait();
+            WindowsUtil.PerformKeyboardClicks(bedName);
+            Task.Delay(100).Wait();
+            WindowsUtil.PerformMouseClick(bedLoc);
+            Task.Delay(1000).Wait();
+            WindowsUtil.PerformMouseClick(RespawnBtnLocation);
         }
 
         /// <summary>
-        /// Fires everytime the bot or user should use the syringe to extract blood.
+        /// 1. Close inventory
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void OnTimerElasped_UseSyringe(object sender, ElapsedEventArgs e)
-        {
-            PrintAction(nameof(OnTimerElasped_UseSyringe));
-            if (Counter == UsesBeforeDeath)
-            {
-                timer.Stop();
-                timer.Elapsed -= OnTimerElasped_UseSyringe;
-                Counter = 0;
-                BeginOpenFridgeProcess();
-                return;
-            }
-            else
-            {
-                Counter++;
-                WindowsUtil.PerformKeyboardClick(KeyboardVKs.E);
-            }                
-        }        
+        //private async void Finish()
+        //{
+        //    await Task.Run(() => {
+        //        try
+        //        {
+        //            // depo syringe
+        //            //Task.Delay(200).Wait();
+        //            //WindowsUtil.PerformMouseClick(TransferAllBtnLocation);
+        //            //Task.Delay(200).Wait();
+        //            //WindowsUtil.PerformKeyboardClick(KeyboardVKs.F);
+
+        //            // Closing self inventory and depo blood in vault
+        //            //Task.Delay(200).Wait();
+        //            //WindowsUtil.PerformKeyboardClick(KeyboardVKs.F);
+        //            //Task.Delay(200).Wait();
+
+        //            //BeginOpenFridgeProcess();
+
+        //            //WindowsUtil.keybd_event((byte)KeyboardVKs.LEFT_ARROW, 0, WindowsUtil.KEYEVENTF_EXTENDEDKEY, 0);
+        //            ////WindowsUtil.SendMessage(WindowsUtil.TargetWindow, WindowsUtil.KEYEVENTF_KEYDOWN, (uint)KeyboardVKs.LEFT_ARROW, 0);
+        //            //Task.Delay(920).Wait();
+        //            //WindowsUtil.keybd_event((byte)KeyboardVKs.LEFT_ARROW, 0, WindowsUtil.KEYEVENTF_EXTENDEDKEY | WindowsUtil.KEYEVENTF_KEYUP, 0);
+        //            ////WindowsUtil.SendMessage(WindowsUtil.TargetWindow, WindowsUtil.KEYEVENTF_KEYUP, (uint)KeyboardVKs.LEFT_ARROW, 0);
+        //            //Task.Delay(200).Wait();
+        //            //WindowsUtil.PerformKeyboardClick(KeyboardVKs.F);
+        //            //Task.Delay(2000).Wait();
+        //            //WindowsUtil.PerformMouseClick(TransferAllBtnLocation);
+        //            //Task.Delay(200).Wait();
+        //            //WindowsUtil.PerformKeyboardClick(KeyboardVKs.F);
+
+        //            // Look down to bed and respawn
+        //            //Task.Delay(200).Wait();
+        //            //WindowsUtil.keybd_event((byte)KeyboardVKs.DOWN_ARROW, 0, WindowsUtil.KEYEVENTF_EXTENDEDKEY, 0);
+        //            //Task.Delay(1800).Wait();
+        //            //WindowsUtil.keybd_event((byte)KeyboardVKs.DOWN_ARROW, 0, WindowsUtil.KEYEVENTF_EXTENDEDKEY | WindowsUtil.KEYEVENTF_KEYUP, 0);
+        //            //Task.Delay(200).Wait();
+        //            //WindowsUtil.PerformKeyboardClick(KeyboardVKs.E);
+        //            //Task.Delay(1500).Wait();
+        //            //WindowsUtil.PerformMouseClick(RespawnSearchBarLocation);
+        //            //Task.Delay(200).Wait();
+        //            //WindowsUtil.PerformKeyboardClicks("BDEATH");
+        //            //Task.Delay(1000).Wait();
+        //            //WindowsUtil.PerformMouseClick(DeathBedsLocation);
+        //            //Task.Delay(1000).Wait();
+        //            //WindowsUtil.PerformMouseClick(RespawnBtnLocation);
+        //            Task.Delay(15000).Wait();
+        //            Begin();
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            Console.WriteLine(ex.Message);
+        //        }
+        //    });
+        //}
 
         public void Stop()
         {
@@ -494,11 +616,6 @@ namespace RedAlertBot.Models
         {
             DeathBedsLocation = p;
             WindowsUtil.MouseCoordsPolled = null;
-        }
-
-        private void OpenOtherInventory()
-        {
-            WindowsUtil.PerformKeyboardClick(KeyboardVKs.F);
         }
 
         private static void PrintAction(string actionName) => Console.WriteLine("Action: " + actionName);

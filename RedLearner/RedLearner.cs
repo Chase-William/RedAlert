@@ -8,7 +8,8 @@ using Microsoft.ML.Data;
 namespace RedLearner
 {
     public class RedLearner
-    {
+    {        
+
         static readonly string _assetsPath = Path.Combine(Environment.CurrentDirectory, "assets");
         static readonly string _imagesFolder = Path.Combine(_assetsPath, "images_regression");
         static readonly string _trainTagsTsv = Path.Combine(_imagesFolder, "tags.tsv");
@@ -64,7 +65,30 @@ namespace RedLearner
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        public string ClassifySingleImage(string path)
+        //public string ClassifySingleImage(string path)
+        //{
+        //    var imageData = new ImageData()
+        //    {
+        //        ImagePath = path
+        //    };
+
+        //    try
+        //    {
+        //        // Make prediction function (input = ImageData, output = ImagePrediction)
+        //        var predictor = mlContext.Model.CreatePredictionEngine<ImageData, ImagePrediction>(model);
+        //        var prediction = predictor.Predict(imageData);
+        //        Console.ForegroundColor = ConsoleColor.Green;
+        //        Console.WriteLine($"Image: {Path.GetFileName(imageData.ImagePath)} predicted as: {prediction.PredictedLabelValue} with score: {prediction.Score.Max()} ");
+        //        Console.ForegroundColor = ConsoleColor.White;
+        //        return prediction.PredictedLabelValue;
+        //    }            
+        //    catch (Exception ex)
+        //    {
+        //        throw new Exception(ex.Message);
+        //    }
+        //}
+
+        public PredictionResult ClassifySingleImage(string path)
         {
             var imageData = new ImageData()
             {
@@ -79,8 +103,8 @@ namespace RedLearner
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine($"Image: {Path.GetFileName(imageData.ImagePath)} predicted as: {prediction.PredictedLabelValue} with score: {prediction.Score.Max()} ");
                 Console.ForegroundColor = ConsoleColor.White;
-                return prediction.PredictedLabelValue;
-            }            
+                return new PredictionResult(prediction.PredictedLabelValue, prediction.Score.Max());
+            }
             catch (Exception ex)
             {
                 throw new Exception(ex.Message);
@@ -157,5 +181,58 @@ namespace RedLearner
         /// contains a value for the predicted image classification label.
         /// </summary>
         public string PredictedLabelValue;
+    }
+
+    public readonly struct PredictionResult
+    {
+        public const string VAULT = "Vault";
+        public const string VAULT_UI = "VaultUI";
+        public const string FRIDGE = "Fridge";
+        public const string FRIDGE_UI = "FridgeUI";
+        public const string BED = "Bed";
+        public const string BED_UI = "BedUI";
+
+        public ImgClasses Class { get; }
+        public float Confidence { get; }
+
+        public PredictionResult(string _class, float _value)
+        {
+            switch (_class)
+            {
+                case VAULT:
+                    Class = ImgClasses.Vault;
+                    break;
+                case VAULT_UI:
+                    Class = ImgClasses.Vault_UI;
+                    break;
+                case FRIDGE:
+                    Class = ImgClasses.Fridge;
+                    break;
+                case FRIDGE_UI:
+                    Class = ImgClasses.Fridge_UI;
+                    break;
+                case BED:
+                    Class = ImgClasses.Bed;
+                    break;
+                case BED_UI:
+                    Class = ImgClasses.Bed_UI;
+                    break;
+                default:
+                    Class = ImgClasses.Error;
+                    break;
+            }
+            Confidence = _value;
+        }
+    }
+
+    public enum ImgClasses
+    {
+        Error = 0,
+        Vault,
+        Vault_UI,
+        Fridge,
+        Fridge_UI,
+        Bed,
+        Bed_UI
     }
 }
